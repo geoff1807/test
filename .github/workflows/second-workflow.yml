@@ -8,3 +8,12 @@ jobs:
         run: echo "Hello world"
       - name: 
         run: echo "Done - bye!"
+      - name: Using a github action
+        uses: actions/checkout@v3
+      - name: Install node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: nom ci
+      - run: npm test
+          
