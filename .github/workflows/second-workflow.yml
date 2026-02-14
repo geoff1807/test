@@ -14,6 +14,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: nom ci
-      - run: npm test
+      - name: Install Dependencies
+        run: nom ci
+      - name: run tests
+        run: npm test
           
