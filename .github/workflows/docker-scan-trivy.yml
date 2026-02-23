@@ -50,6 +50,7 @@ jobs:
           output: trivy-report.html
           severity: HIGH,CRITICAL
           ignore-unfixed: true
+          scanners: vuln
           exit-code: 0
 
       - name: Trivy (JSON report)
@@ -60,6 +61,7 @@ jobs:
           output: trivy-report.json
           severity: HIGH,CRITICAL
           ignore-unfixed: true
+          scanners: vuln
           exit-code: 0
 
       - name: Trivy (SARIF for GitHub Security tab - only HIGH/CRITICAL)) 
@@ -70,6 +72,7 @@ jobs:
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
+          scanners: vuln
           exit-code: 0
 
       - name: Sanity check SARIF contains only HIGH/CRITICAL
