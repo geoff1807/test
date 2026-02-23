@@ -62,7 +62,7 @@ jobs:
           ignore-unfixed: true
           exit-code: 0
 
-      - name: Trivy (SARIF for GitHub Security tab)
+      - name: Trivy (SARIF for GitHub Security tab - only HIGH/CRITICAL)) 
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: ${{ env.IMAGE_NAME }}
@@ -71,6 +71,13 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 0
+
+      - name: Sanity check SARIF contains only HIGH/CRITICAL
+        run: |
+          if grep -E '"level":"(note|warning)"' -n trivy-results.sarif; then
+            echo "SARIF contains non-HIGH/CRITICAL entries (note/warning). Check Trivy config." >&2
+            exit 1
+          fi
 
       # Quick sanity check so you can see files exist in logs
       - name: Verify reports exist
