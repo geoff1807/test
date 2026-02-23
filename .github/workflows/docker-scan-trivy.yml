@@ -36,36 +36,62 @@ jobs:
           load: true
 
       # ---------------------------
-      # Trivy JSON report (artifact)
+      # Trivy reports (report-only)
       # ---------------------------
-      - name: Run Trivy (JSON report)
+
+      - name: Trivy (Human-readable HTML report)
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{ env.IMAGE_NAME }}
+          image-ref: ${{ env.IMAGE_REF }}
+          format: template
+          template: "@/contrib/html.tpl"
+          output: trivy-report.html
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+
+      - name: Trivy (JSON report)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ env.IMAGE_REF }}
           format: json
           output: trivy-report.json
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 0   # Report-only mode
+          exit-code: 0
 
-      - name: Upload Trivy JSON report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-json-report
-          path: trivy-report.json
-
-      # ---------------------------
-      # Trivy SARIF report (GitHub Security tab)
-      # ---------------------------
-      - name: Run Trivy (SARIF)
+      - name: Trivy (SARIF for GitHub Security tab)
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{ env.IMAGE_NAME }}
+          image-ref: ${{ env.IMAGE_REF }}
           format: sarif
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 0
+
+      # Quick sanity check so you can see files exist in logs
+      - name: Verify reports exist
+        run: |
+          ls -lah trivy-report.html trivy-report.json trivy-results.sarif
+
+      # ---------------------------
+      # Upload artifacts (downloadable)
+      # ---------------------------
+
+      - name: Upload Trivy reports (artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports-${{ github.run_id }}
+          path: |
+            trivy-report.html
+            trivy-report.json
+            trivy-results.sarif
+          if-no-files-found: error
+
+      # ---------------------------
+      # Publish findings to GitHub Security tab
+      # ---------------------------
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
