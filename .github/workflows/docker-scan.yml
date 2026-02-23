@@ -15,7 +15,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t flask-app:${{ github.sha }} -f .
+          docker build -t flask-app:${{ github.sha }} -f Dockerfile .
 
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@master
